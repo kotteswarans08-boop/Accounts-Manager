@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chit Accounts Manager</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#03045E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="https://i.postimg.cc/fbV2x4JW/app-logo.png">
+<style>
+  :root {
+    --c1: #03045E;
+    --c2: #0077B6;
+    --c3: #00B4D8;
+    --c4: #90E0EF;
+    --c5: #CAF0F8;
+    --white: #ffffff;
+    --gray-light: #f0f4f8;
+    --gray-mid: #dce8f0;
+    --text-dark: #03045E;
+    --text-mid: #0077B6;
+    --text-light: #555f6e;
+    --success: #1b9c50;
+    --danger: #c0392b;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 20px rgba(3,4,94,0.12);
+    --shadow-sm: 0 2px 8px rgba(3,4,94,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--c5) 0%, #e0f7fa 100%);
+    min-height: 100vh;
+    color: var(--text-dark);
+  }
+
+  /* ---- LOGIN ---- */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(160deg, var(--c1) 0%, var(--c2) 50%, var(--c3) 100%);
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(3,4,94,0.3);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .login-logo img {
+    width: 88px;
+    height: 88px;
+    border-radius: 20px;
+    object-fit: cover;
+    margin-bottom: 12px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 16px rgba(3,4,94,0.18);
+  }
+  .login-logo h1 { font-size: 22px; font-weight: 700; color: var(--c1); }
+  .login-logo p { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+
+  .form-group { margin-bottom: 16px; position: relative; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--c1);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--gray-mid);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    color: var(--text-dark);
+    background: var(--gray-light);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--c3);
+    box-shadow: 0 0 0 3px rgba(0,180,216,0.15);
+    background: var(--white);
+  }
+  .form-group input.error { border-color: var(--danger); background: #fff8f8; }
+  .error-msg {
+    font-size: 12px;
+    color: var(--danger);
+    margin-top: 5px;
+    display: none;
+    font-weight: 500;
+  }
+  .error-msg.show { display: block; }
+
+  .fy-row { display: flex; gap: 10px; align-items: center; }
+  .fy-row input { flex: 1; }
+  .fy-sep { color: var(--text-light); font-size: 13px; white-space: nowrap; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+  .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--c2); }
+  .checkbox-row label { font-size: 14px; color: var(--text-light); cursor: pointer; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, var(--c1), var(--c2));
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: var(--c5);
+    color: var(--c2);
+    border: 1.5px solid var(--c4);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { background: var(--c4); }
+
+  /* Company suggestion dropdown */
+  .company-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: var(--white);
+    border: 1.5px solid var(--c4);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    z-index: 50;
+    display: none;
+    overflow: hidden;
+  }
+  .company-suggestions.show { display: block; }
+  .company-sugg-item {
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--c1);
+    cursor: pointer;
+    border-bottom: 0.5px solid var(--gray-mid);
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .company-sugg-item:last-child { border-bottom: none; }
+  .company-sugg-item:hover { background: var(--c5); }
+
+  /* ---- MAIN APP ---- */
+  #app-screen { display: none; min-height: 100vh; flex-direction: column; }
+  .topbar {
+    background: linear-gradient(90deg, var(--c1), var(--c2));
+    color: var(--white);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(3,4,94,0.25);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-logo {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .topbar-logo img { width: 100%; height: 100%; object-fit: cover; }
+  .topbar-title h2 { font-size: 15px; font-weight: 700; }
+  .topbar-title p { font-size: 11px; opacity: 0.75; }
+  .topbar-right { display: flex; gap: 8px; }
+  .topbar-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: var(--white);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .topbar-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* Overflow menu */
+  .overflow-menu {
+    position: absolute;
+    top: 44px; right: 0;
+    background: var(--c1);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    min-width: 150px;
+    display: none;
+    z-index: 200;
+  }
+  .overflow-menu.show { display: block; }
+  .overflow-menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 16px;
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+  }
+  .overflow-menu button:hover { background: rgba(255,255,255,0.1); }
+  .overflow-menu button + button { border-top: 0.5px solid rgba(255,255,255,0.15); }
+
+  /* Tabs */
+  .tabs { display: flex; background: var(--c1); border-bottom: none; }
+  .tab-btn {
+    flex: 1;
+    padding: 13px 8px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn.active { color: var(--white); border-bottom-color: var(--c3); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Content */
+  .content { padding: 16px; max-width: 700px; margin: 0 auto; }
+
+  /* Entry card */
+  .entry-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .entry-header {
+    background: linear-gradient(90deg, var(--c2), var(--c3));
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .entry-header h3 { color: var(--white); font-size: 16px; font-weight: 700; }
+  .date-badge {
+    background: rgba(255,255,255,0.2);
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .journal-table { width: 100%; border-collapse: collapse; }
+  .journal-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--c2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1.5px solid var(--c5);
+    background: #f8fcff;
+  }
+  .journal-table th:last-child, .journal-table td:last-child { text-align: right; }
+  .journal-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gray-mid);
+    vertical-align: middle;
+  }
+  .journal-table tr:last-child td { border-bottom: none; }
+  .ledger-input-wrap { position: relative; }
+  .ledger-input {
+    width: 100%;
+    border: none;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: transparent;
+    outline: none;
+    padding: 4px 0;
+    border-bottom: 1.5px solid var(--gray-mid);
+    transition: border-color 0.2s;
+  }
+  .ledger-input:focus { border-bottom-color: var(--c3); }
+  .ledger-input::placeholder { color: #aab8c2; }
+  .amount-input {
+    width: 90px;
+    border: none;
+    text-align: right;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: transparent;
+    outline: none;
+    padding: 4px 0;
+    border-bottom: 1.5px solid var(--gray-mid);
+    transition: border-color 0.2s;
+  }
+  .amount-input:focus { border-bottom-color: var(--c3); }
+  .remarks-input {
+    width: 100%;
+    border: none;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: transparent;
+    outline: none;
+    border-bottom: 1.5px solid var(--gray-mid);
+    transition: border-color 0.2s;
+  }
+  .remarks-input:focus { border-bottom-color: var(--c3); }
+  .btn-save {
+    background: linear-gradient(90deg, var(--c2), var(--c3));
+    color: var(--white);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-save:hover { opacity: 0.88; }
+
+  /* Autocomplete */
+  .autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: var(--white);
+    border: 1px solid var(--c4);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    z-index: 50;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+  }
+  .autocomplete-list.show { display: block; }
+  .autocomplete-item {
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--c1);
+    cursor: pointer;
+    border-bottom: 0.5px solid var(--gray-mid);
+    transition: background 0.15s;
+  }
+  .autocomplete-item:hover { background: var(--c5); }
+  .autocomplete-item:last-child { border-bottom: none; }
+
+  /* Entry rows */
+  .entries-list { margin-top: 4px; }
+  .entry-row {
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--c3);
+  }
+  .entry-row-left .particulars { font-size: 13px; font-weight: 600; color: var(--c1); }
+  .entry-row-left .date { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+  .entry-row-right { text-align: right; }
+  .entry-row-right .amount { font-size: 15px; font-weight: 700; color: var(--c2); }
+  .cr-badge { display: inline-block; background: #e8f5e9; color: var(--success); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 4px; }
+  .dr-badge { display: inline-block; background: #fdecea; color: var(--danger); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 4px; }
+
+  /* Report */
+  .report-list { display: flex; flex-direction: column; gap: 10px; }
+  .report-item {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1.5px solid transparent;
+  }
+  .report-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--c4); }
+  .report-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .report-icon.blue { background: var(--c5); }
+  .report-icon.teal { background: #e1f5fe; }
+  .report-icon.green { background: #e8f5e9; }
+  .report-icon.purple { background: #ede7f6; }
+  .report-icon.orange { background: #fff3e0; }
+  .report-icon.indigo { background: #e8eaf6; }
+  .report-info h4 { font-size: 15px; font-weight: 700; color: var(--c1); }
+  .report-info p { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+  .report-arrow { margin-left: auto; color: var(--c4); font-size: 20px; }
+
+  .report-header {
+    background: linear-gradient(90deg, var(--c1), var(--c2));
+    color: var(--white);
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .report-header h3 { font-size: 16px; font-weight: 700; }
+  .report-header .back-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .report-date-bar {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 14px;
+  }
+  .report-table-wrap { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .report-table { width: 100%; border-collapse: collapse; }
+  .report-table th {
+    padding: 12px 16px;
+    background: var(--c1);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+  }
+  .report-table th.right { text-align: right; }
+  .report-table td { padding: 11px 16px; border-bottom: 1px solid var(--gray-mid); font-size: 13px; color: var(--text-dark); }
+  .report-table td.credit { color: var(--success); font-weight: 600; text-align: right; }
+  .report-table td.debit { color: #1565c0; font-weight: 600; text-align: right; }
+  .report-table tr:last-child td { border-bottom: none; }
+  .report-table tr:hover td { background: #f8fcff; }
+  .report-total-row td { background: var(--c5); font-weight: 700; color: var(--c1); border-bottom: none; border-top: 1.5px solid var(--c4); }
+
+  .bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .bs-side { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .bs-side-header { padding: 12px 14px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .bs-side-header.liab { background: #fce4ec; color: #ad1457; }
+  .bs-side-header.assets { background: #e8f5e9; color: #2e7d32; }
+  .bs-item { padding: 12px 14px; border-bottom: 1px solid var(--gray-mid); }
+  .bs-item:last-child { border-bottom: none; }
+  .bs-item-name { font-size: 13px; font-weight: 600; color: var(--c1); }
+  .bs-item-amount { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .bs-item-amount.liab { color: #ad1457; }
+  .bs-item-amount.asset { color: #2e7d32; }
+  .bs-total { background: var(--c1); padding: 12px 14px; border-radius: 0 0 var(--radius) var(--radius); display: flex; justify-content: space-between; align-items: center; }
+  .bs-total span { color: rgba(255,255,255,0.75); font-size: 12px; text-transform: uppercase; font-weight: 600; }
+  .bs-total strong { color: var(--white); font-size: 18px; }
+
+  /* Tools */
+  .tools-list { display: flex; flex-direction: column; gap: 10px; }
+  .tool-item {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1.5px solid transparent;
+  }
+  .tool-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--c4); }
+  .tool-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--c2), var(--c3));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .tool-info h4 { font-size: 15px; font-weight: 700; color: var(--c1); }
+  .tool-info p { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(3,4,94,0.45);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 36px;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 -8px 40px rgba(3,4,94,0.2);
+    animation: slideUp 0.25s ease;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--gray-mid); border-radius: 2px; margin: 0 auto 20px; }
+  .modal-title { font-size: 18px; font-weight: 700; color: var(--c1); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .modal-form .form-group label { font-size: 12px; }
+  .modal-form .form-group input, .modal-form .form-group select { padding: 11px 14px; font-size: 14px; }
+  .modal-row { display: flex; gap: 10px; }
+  .modal-row .form-group { flex: 1; }
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-row .btn-primary { font-size: 14px; padding: 12px; }
+  .btn-danger {
+    flex: 1;
+    padding: 12px;
+    background: #fdecea;
+    color: var(--danger);
+    border: 1.5px solid #f5c6cb;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-danger:hover { background: #f5c6cb; }
+  .group-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .group-chip {
+    padding: 10px 12px;
+    border: 1.5px solid var(--c4);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--c2);
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s, color 0.15s;
+    background: var(--white);
+  }
+  .group-chip.selected { background: var(--c2); color: var(--white); border-color: var(--c2); }
+  .group-chip:hover:not(.selected) { background: var(--c5); }
+
+  /* Summary cards */
+  .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .summary-card { background: var(--white); border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; box-shadow: var(--shadow-sm); }
+  .summary-card .s-label { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .summary-card .s-val { font-size: 18px; font-weight: 700; }
+  .summary-card .s-val.credit { color: var(--success); }
+  .summary-card .s-val.debit { color: #1565c0; }
+  .summary-card .s-val.total { color: var(--c1); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--c1);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    z-index: 999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Calculator */
+  .calc-btn {
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--gray-light);
+    color: var(--c1);
+    transition: background 0.15s;
+  }
+  .calc-btn:hover { background: var(--c5); }
+  .calc-btn:active { transform: scale(0.95); }
+  .calc-special { background: var(--c5); color: var(--c2); }
+  .calc-op { background: rgba(0,119,182,0.12); color: var(--c2); font-size: 20px; }
+  .calc-eq { background: linear-gradient(135deg, var(--c2), var(--c3)); color: white; font-size: 22px; }
+
+  @media (max-width: 480px) {
+    .login-card { padding: 28px 20px; }
+    .summary-cards { grid-template-columns: 1fr 1fr; }
+    .bs-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="https://i.postimg.cc/fbV2x4JW/app-logo.png" alt="Chit Accounts Manager Logo">
+      <h1>Accounts Manager</h1>
+      <p>Smart accounting for chit fund businesses</p>
+    </div>
+
+    <div class="form-group">
+      <label>Company Name</label>
+      <input type="text" id="company-name" placeholder="Enter company name" autocomplete="off"
+             oninput="onCompanyInput(this.value)" onblur="setTimeout(()=>hideSuggestions(),200)">
+      <div class="company-suggestions" id="company-suggestions"></div>
+      <div class="error-msg" id="err-company">Company name is required.</div>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Enter password">
+      <div class="error-msg" id="err-password">Incorrect company name or password.</div>
+    </div>
+
+    <div class="form-group">
+      <label>Financial Year</label>
+      <div class="fy-row">
+        <input type="date" id="fy-start" value="2026-04-01">
+        <span class="fy-sep">to</span>
+        <input type="date" id="fy-end" value="2027-03-31">
+      </div>
+    </div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="remember-me">
+      <label for="remember-me">Remember me</label>
+    </div>
+
+    <button class="btn-primary" onclick="doLogin()">🔐 Log In</button>
+    <button class="btn-secondary" onclick="doCreateCompany()">🏢 Create New Company</button>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app-screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <img src="https://i.postimg.cc/fbV2x4JW/app-logo.png" alt="Logo">
+      </div>
+      <div class="topbar-title">
+        <h2 id="company-display">Account Manager</h2>
+        <p id="fy-display">Financial Year 2026-27</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div style="position:relative;">
+        <button class="topbar-btn" onclick="toggleMenu()" title="Menu">⋮</button>
+        <div class="overflow-menu" id="overflow-menu">
+          <button onclick="showToast('Data refreshed','🔄'); closeMenu()">🔄 Refresh</button>
+          <button onclick="logout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('entry',this)">📒 Entry</button>
+    <button class="tab-btn" onclick="switchTab('report',this)">📊 Report</button>
+    <button class="tab-btn" onclick="switchTab('tools',this)">🔧 Tools</button>
+  </div>
+
+  <!-- ENTRY TAB -->
+  <div id="tab-entry" class="tab-content active">
+    <div class="content">
+      <div class="entry-card">
+        <div class="entry-header">
+          <h3>📒 Journal Entry</h3>
+          <div class="date-badge" onclick="document.getElementById('entry-date').showPicker ? document.getElementById('entry-date').showPicker() : document.getElementById('entry-date').focus()">
+            📅 <span id="entry-date-display">--/--/----</span>
+            <input type="date" id="entry-date" style="display:none;" onchange="updateEntryDate(this.value)">
+          </div>
+        </div>
+        <table class="journal-table">
+          <thead>
+            <tr>
+              <th>Particulars</th>
+              <th class="right">Credit</th>
+              <th class="right">Debit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="ledger-input-wrap">
+                  <input class="ledger-input" id="ledger1" placeholder="Search Ledger..." oninput="showAuto(this,'auto1')" autocomplete="off">
+                  <div class="autocomplete-list" id="auto1"></div>
+                </div>
+              </td>
+              <td><input class="amount-input" id="cr1" type="number" placeholder="0.00" step="0.01" min="0"></td>
+              <td><input class="amount-input" id="dr1" type="number" placeholder="0.00" step="0.01" min="0"></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="ledger-input-wrap">
+                  <input class="ledger-input" id="ledger2" placeholder="Search Ledger..." oninput="showAuto(this,'auto2')" autocomplete="off">
+                  <div class="autocomplete-list" id="auto2"></div>
+                </div>
+              </td>
+              <td><input class="amount-input" id="cr2" type="number" placeholder="0.00" step="0.01" min="0"></td>
+              <td><input class="amount-input" id="dr2" type="number" placeholder="0.00" step="0.01" min="0"></td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding:12px 14px;">
+                <input class="remarks-input" id="remarks" placeholder="Remarks / Narration...">
+              </td>
+              <td style="text-align:right; padding:12px 14px;">
+                <button class="btn-save" onclick="saveJournal()">💾 Save</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="font-size:14px;font-weight:700;color:var(--c1);">Recent Entries</h3>
+        <span style="font-size:12px;color:var(--text-light);" id="entries-count">0 entries</span>
+      </div>
+      <div class="entries-list" id="entries-list">
+        <div style="text-align:center;padding:30px;color:var(--text-light);font-size:13px;">
+          <div style="font-size:40px;margin-bottom:10px;">📄</div>
+          No entries yet. Create your first journal entry above.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT TAB -->
+  <div id="tab-report" class="tab-content">
+    <div class="content">
+      <div id="report-list-view">
+        <div class="report-list">
+          <div class="report-item" onclick="showReport('ledger')">
+            <div class="report-icon blue">📖</div>
+            <div class="report-info"><h4>Ledger</h4><p>Individual account statements</p></div>
+            <span class="report-arrow">›</span>
+          </div>
+          <div class="report-item" onclick="showReport('daybook')">
+            <div class="report-icon teal">📅</div>
+            <div class="report-info"><h4>Day Book</h4><p>Daily transaction summary</p></div>
+            <span class="report-arrow">›</span>
+          </div>
+          <div class="report-item" onclick="showReport('trial')">
+            <div class="report-icon green">⚖️</div>
+            <div class="report-info"><h4>Trial Balance</h4><p>Debit &amp; credit totals</p></div>
+            <span class="report-arrow">›</span>
+          </div>
+          <div class="report-item" onclick="showReport('grouptrial')">
+            <div class="report-icon purple">📚</div>
+            <div class="report-info"><h4>Group Trial Balance</h4><p>Group-wise trial balance</p></div>
+            <span class="report-arrow">›</span>
+          </div>
+          <div class="report-item" onclick="showReport('pl')">
+            <div class="report-icon orange">📈</div>
+            <div class="report-info"><h4>Profit &amp; Loss Account</h4><p>Income vs expenses</p></div>
+            <span class="report-arrow">›</span>
+          </div>
+          <div class="report-item" onclick="showReport('bs')">
+            <div class="report-icon indigo">📋</div>
+            <div class="report-info"><h4>Balance Sheet</h4><p>Assets &amp; liabilities overview</p></div>
+            <span class="report-arrow">›</span>
+          </div>
+        </div>
+      </div>
+      <div id="report-detail-view" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- TOOLS TAB -->
+  <div id="tab-tools" class="tab-content">
+    <div class="content">
+      <div class="tools-list">
+        <div class="tool-item" onclick="openModal('create-ledger-modal')">
+          <div class="tool-icon">➕</div>
+          <div class="tool-info"><h4>Create Ledger</h4><p>Add new account ledger</p></div>
+          <span style="margin-left:auto;color:var(--c4);font-size:20px;">›</span>
+        </div>
+        <div class="tool-item" onclick="openModal('modify-ledger-modal')">
+          <div class="tool-icon" style="background:linear-gradient(135deg,var(--c1),var(--c2));">✏️</div>
+          <div class="tool-info"><h4>Modify Ledger</h4><p>Edit or delete existing ledger</p></div>
+          <span style="margin-left:auto;color:var(--c4);font-size:20px;">›</span>
+        </div>
+        <div class="tool-item" onclick="openModal('change-fy-modal')">
+          <div class="tool-icon" style="background:linear-gradient(135deg,#1976d2,#42a5f5);">📅</div>
+          <div class="tool-info"><h4>Change Financial Year</h4><p>Switch to a different year</p></div>
+          <span style="margin-left:auto;color:var(--c4);font-size:20px;">›</span>
+        </div>
+        <div class="tool-item" onclick="openModal('edit-company-modal')">
+          <div class="tool-icon" style="background:linear-gradient(135deg,#00897b,#26c6da);">🏢</div>
+          <div class="tool-info"><h4>Edit Company Details</h4><p>Update name, password &amp; address</p></div>
+          <span style="margin-left:auto;color:var(--c4);font-size:20px;">›</span>
+        </div>
+        <div class="tool-item" onclick="openModal('calculator-modal')">
+          <div class="tool-icon" style="background:linear-gradient(135deg,#7b1fa2,#ab47bc);">🧮</div>
+          <div class="tool-info"><h4>Calculator</h4><p>Quick financial calculations</p></div>
+          <span style="margin-left:auto;color:var(--c4);font-size:20px;">›</span>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="font-size:14px;font-weight:700;color:var(--c1);margin-bottom:10px;">
+          📋 All Ledgers
+        </h3>
+        <div id="ledger-list-display">
+          <div style="text-align:center;padding:20px;color:var(--text-light);font-size:13px;">
+            <div style="font-size:32px;margin-bottom:6px;">📂</div>
+            No ledgers created yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Create Ledger -->
+<div class="modal-backdrop" id="create-ledger-modal" onclick="closeOnBackdrop(event,'create-ledger-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">➕ Create Ledger</div>
+    <div class="modal-form">
+      <div class="form-group">
+        <label>Ledger Name</label>
+        <input type="text" id="new-ledger-name" placeholder="Enter ledger name">
+      </div>
+      <div class="modal-row">
+        <div class="form-group" style="flex:2;">
+          <label>Opening Balance</label>
+          <input type="number" id="new-ledger-balance" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Type</label>
+          <select id="new-ledger-type">
+            <option value="Cr">Cr.</option>
+            <option value="Dr">Dr.</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="new-ledger-address" placeholder="Address (optional)">
+      </div>
+      <div class="form-group">
+        <label>Contact No.</label>
+        <input type="tel" id="new-ledger-contact" placeholder="Contact number (optional)">
+      </div>
+      <div class="form-group">
+        <label>Group</label>
+        <div class="group-grid" id="group-grid-create">
+          <div class="group-chip selected" onclick="selectGroup(this,'create')">ASSETS</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">CAPITAL</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">CASH &amp; BANK</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">CREDITORS / DEBTORS</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">EXPENSES / INCOME</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">DUTIES &amp; TAXES</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">LIABILITIES</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">LOAN / ADVANCES</div>
+          <div class="group-chip" onclick="selectGroup(this,'create')">SECURITIES</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" style="flex:1;" onclick="saveLedger()">💾 Save Ledger</button>
+        <button class="btn-danger" onclick="closeModal('create-ledger-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modify Ledger -->
+<div class="modal-backdrop" id="modify-ledger-modal" onclick="closeOnBackdrop(event,'modify-ledger-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Modify Ledger</div>
+    <div class="modal-form">
+      <div class="form-group">
+        <label>Select Ledger</label>
+        <select id="modify-select" onchange="loadLedgerToModify(this.value)">
+          <option value="">-- Select a ledger --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ledger Name</label>
+        <input type="text" id="mod-name" placeholder="Ledger name">
+      </div>
+      <div class="modal-row">
+        <div class="form-group" style="flex:2;">
+          <label>Opening Balance</label>
+          <input type="number" id="mod-balance" placeholder="0.00">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Type</label>
+          <select id="mod-type"><option value="Cr">Cr.</option><option value="Dr">Dr.</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Group</label>
+        <div class="group-grid" id="group-grid-modify">
+          <div class="group-chip selected" onclick="selectGroup(this,'modify')">ASSETS</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">CAPITAL</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">CASH &amp; BANK</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">CREDITORS / DEBTORS</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">EXPENSES / INCOME</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">DUTIES &amp; TAXES</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">LIABILITIES</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">LOAN / ADVANCES</div>
+          <div class="group-chip" onclick="selectGroup(this,'modify')">SECURITIES</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" style="flex:1;" onclick="updateLedger()">💾 Save</button>
+        <button class="btn-danger" onclick="deleteLedger()">🗑️ Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Change FY -->
+<div class="modal-backdrop" id="change-fy-modal" onclick="closeOnBackdrop(event,'change-fy-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Change Financial Year</div>
+    <div class="modal-form">
+      <div class="form-group">
+        <label>From Date</label>
+        <input type="date" id="new-fy-start" value="2026-04-01">
+      </div>
+      <div class="form-group">
+        <label>To Date</label>
+        <input type="date" id="new-fy-end" value="2027-03-31">
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" style="flex:1;" onclick="changeFY()">✅ Apply</button>
+        <button class="btn-danger" onclick="closeModal('change-fy-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Company -->
+<div class="modal-backdrop" id="edit-company-modal" onclick="closeOnBackdrop(event,'edit-company-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏢 Edit Company Details</div>
+    <div class="modal-form">
+      <div class="form-group">
+        <label>Company Name</label>
+        <input type="text" id="edit-company-name" placeholder="Company Name">
+      </div>
+      <div class="form-group">
+        <label>Current Password</label>
+        <input type="password" id="edit-cur-pass" placeholder="Current Password">
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="edit-new-pass" placeholder="New Password (leave blank to keep current)">
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="edit-conf-pass" placeholder="Re-enter new password">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="edit-address" placeholder="Address">
+      </div>
+      <div class="form-group">
+        <label>Contact No.</label>
+        <input type="tel" id="edit-contact" placeholder="Contact No.">
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" style="flex:1;" onclick="saveCompanyEdit()">💾 Save</button>
+        <button class="btn-danger" onclick="closeModal('edit-company-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Calculator -->
+<div class="modal-backdrop" id="calculator-modal" onclick="closeOnBackdrop(event,'calculator-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🧮 Calculator</div>
+    <div style="background:var(--c1);border-radius:var(--radius);padding:16px 20px;margin-bottom:14px;">
+      <div id="calc-history" style="color:rgba(255,255,255,0.5);font-size:13px;min-height:18px;text-align:right;"></div>
+      <div id="calc-display" style="color:white;font-size:32px;font-weight:300;text-align:right;margin-top:4px;">0</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+      <button onclick="calcBtn('C')" style="grid-column:span 2;" class="calc-btn calc-special">C</button>
+      <button onclick="calcBtn('%')" class="calc-btn calc-special">%</button>
+      <button onclick="calcBtn('/')" class="calc-btn calc-op">÷</button>
+      <button onclick="calcBtn('7')" class="calc-btn">7</button>
+      <button onclick="calcBtn('8')" class="calc-btn">8</button>
+      <button onclick="calcBtn('9')" class="calc-btn">9</button>
+      <button onclick="calcBtn('*')" class="calc-btn calc-op">×</button>
+      <button onclick="calcBtn('4')" class="calc-btn">4</button>
+      <button onclick="calcBtn('5')" class="calc-btn">5</button>
+      <button onclick="calcBtn('6')" class="calc-btn">6</button>
+      <button onclick="calcBtn('-')" class="calc-btn calc-op">−</button>
+      <button onclick="calcBtn('1')" class="calc-btn">1</button>
+      <button onclick="calcBtn('2')" class="calc-btn">2</button>
+      <button onclick="calcBtn('3')" class="calc-btn">3</button>
+      <button onclick="calcBtn('+')" class="calc-btn calc-op">+</button>
+      <button onclick="calcBtn('0')" style="grid-column:span 2;" class="calc-btn">0</button>
+      <button onclick="calcBtn('.')" class="calc-btn">.</button>
+      <button onclick="calcBtn('=')" class="calc-btn calc-eq">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toast-icon"></span><span id="toast-msg"></span></div>
+
+<script>
+// ===== STORAGE HELPERS =====
+const COMPANIES_KEY = 'cam_companies';
+
+function getCompanies() {
+  try { return JSON.parse(localStorage.getItem(COMPANIES_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveCompanies(obj) {
+  localStorage.setItem(COMPANIES_KEY, JSON.stringify(obj));
+}
+function getCompanyDataKey(name) { return 'cam_data_' + name; }
+function loadCompanyData(name) {
+  try {
+    const raw = localStorage.getItem(getCompanyDataKey(name));
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { ledgers: [], journals: [], fyStart: '2026-04-01', fyEnd: '2027-03-31', address: '', contact: '' };
+}
+function saveCompanyData() {
+  localStorage.setItem(getCompanyDataKey(currentCompany), JSON.stringify({
+    ledgers, journals, fyStart: currentFyStart, fyEnd: currentFyEnd,
+    address: currentAddress, contact: currentContact
+  }));
+}
+
+// ===== STATE =====
+let ledgers = [];
+let journals = [];
+let currentCompany = '';
+let currentFyStart = '2026-04-01';
+let currentFyEnd   = '2027-03-31';
+let currentAddress = '';
+let currentContact = '';
+let selectedGroup  = 'ASSETS';
+let calcStr        = '';
+
+// ===== LOGIN / COMPANY SUGGESTIONS =====
+function onCompanyInput(val) {
+  clearLoginErrors();
+  const companies = getCompanies();
+  const names = Object.keys(companies);
+  const sugg = document.getElementById('company-suggestions');
+  if (!val) { sugg.classList.remove('show'); return; }
+  const matches = names.filter(n => n.toLowerCase().includes(val.toLowerCase()));
+  if (!matches.length) { sugg.classList.remove('show'); return; }
+  sugg.innerHTML = matches.map(n =>
+    `<div class="company-sugg-item" onclick="selectCompany('${n.replace(/'/g,"\\'")}')">🏢 ${n}</div>`
+  ).join('');
+  sugg.classList.add('show');
+}
+
+function selectCompany(name) {
+  document.getElementById('company-name').value = name;
+  const companies = getCompanies();
+  if (companies[name]) {
+    // Auto-fill password if remembered
+    if (companies[name].remember) {
+      document.getElementById('login-password').value = companies[name].password;
+    } else {
+      document.getElementById('login-password').value = '';
+    }
+  }
+  hideSuggestions();
+  clearLoginErrors();
+}
+
+function hideSuggestions() {
+  document.getElementById('company-suggestions').classList.remove('show');
+}
+
+function clearLoginErrors() {
+  document.getElementById('err-company').classList.remove('show');
+  document.getElementById('err-password').classList.remove('show');
+  document.getElementById('company-name').classList.remove('error');
+  document.getElementById('login-password').classList.remove('error');
+}
+
+function doLogin() {
+  clearLoginErrors();
+  const nameInput = document.getElementById('company-name');
+  const passInput = document.getElementById('login-password');
+  const name = nameInput.value; // case-sensitive: no trim alteration
+  const pass = passInput.value;
+  const remember = document.getElementById('remember-me').checked;
+
+  if (!name) {
+    document.getElementById('err-company').classList.add('show');
+    nameInput.classList.add('error');
+    return;
+  }
+
+  const companies = getCompanies();
+
+  if (!companies[name]) {
+    // Company not found — exact case-sensitive mismatch
+    document.getElementById('err-password').textContent = 'Company not found. Check the name (case-sensitive) or create a new company.';
+    document.getElementById('err-password').classList.add('show');
+    nameInput.classList.add('error');
+    return;
+  }
+
+  // Case-sensitive password check
+  if (companies[name].password !== pass) {
+    document.getElementById('err-password').textContent = 'Incorrect password. Please try again.';
+    document.getElementById('err-password').classList.add('show');
+    passInput.classList.add('error');
+    return;
+  }
+
+  // Update remember preference
+  companies[name].remember = remember;
+  saveCompanies(companies);
+
+  enterApp(name);
+}
+
+function doCreateCompany() {
+  clearLoginErrors();
+  const nameInput = document.getElementById('company-name');
+  const passInput = document.getElementById('login-password');
+  const name = nameInput.value;
+  const pass = passInput.value;
+  const remember = document.getElementById('remember-me').checked;
+
+  if (!name) {
+    document.getElementById('err-company').classList.add('show');
+    nameInput.classList.add('error');
+    return;
+  }
+
+  const companies = getCompanies();
+  if (companies[name]) {
+    document.getElementById('err-password').textContent = 'A company with this name already exists. Please log in instead.';
+    document.getElementById('err-password').classList.add('show');
+    nameInput.classList.add('error');
+    return;
+  }
+
+  // Create new company
+  companies[name] = { password: pass, remember };
+  saveCompanies(companies);
+  showToast('Company "' + name + '" created!', '🏢');
+  enterApp(name);
+}
+
+function enterApp(name) {
+  currentCompany = name;
+  const data = loadCompanyData(name);
+  ledgers = data.ledgers || [];
+  journals = data.journals || [];
+  currentFyStart = data.fyStart || '2026-04-01';
+  currentFyEnd   = data.fyEnd   || '2027-03-31';
+  currentAddress = data.address || '';
+  currentContact = data.contact || '';
+
+  const fyLabel = fyToLabel(currentFyStart, currentFyEnd);
+  document.getElementById('company-display').textContent = name;
+  document.getElementById('fy-display').textContent = 'Financial Year ' + fyLabel;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'flex';
+
+  // Prefill edit form
+  document.getElementById('edit-company-name').value = name;
+  document.getElementById('edit-address').value = currentAddress;
+  document.getElementById('edit-contact').value = currentContact;
+
+  // Set today's date in entry
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('entry-date').value = today;
+  updateEntryDate(today);
+
+  refreshEntries();
+  refreshLedgerList();
+}
+
+function logout() {
+  saveCompanyData();
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-password').value = '';
+  closeMenu();
+  // clear tabs back to entry
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('.tab-content').forEach((c,i) => c.classList.toggle('active', i===0));
+}
+
+function fyToLabel(start, end) {
+  const s = start.split('-'), e = end.split('-');
+  return s[0].slice(2) + '-' + e[0].slice(2);
+}
+
+// ===== TABS =====
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name === 'report') {
+    document.getElementById('report-list-view').style.display = '';
+    document.getElementById('report-detail-view').style.display = 'none';
+  }
+  if (name === 'tools') refreshLedgerList();
+}
+
+// ===== OVERFLOW MENU =====
+function toggleMenu() { document.getElementById('overflow-menu').classList.toggle('show'); }
+function closeMenu()  { document.getElementById('overflow-menu').classList.remove('show'); }
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.topbar-btn') && !e.target.closest('.overflow-menu')) closeMenu();
+  if (!e.target.closest('.ledger-input-wrap')) {
+    document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('show'));
+  }
+});
+
+// ===== DATE =====
+function updateEntryDate(v) {
+  if (!v) return;
+  const d = new Date(v + 'T00:00:00');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  document.getElementById('entry-date-display').textContent = dd+'/'+mm+'/'+d.getFullYear();
+}
+function fmtDate(s) {
+  const d = new Date(s + 'T00:00:00');
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+
+// ===== AUTOCOMPLETE =====
+function showAuto(input, listId) {
+  const val = input.value.toLowerCase();
+  const list = document.getElementById(listId);
+  if (!val) { list.classList.remove('show'); return; }
+  const matches = ledgers.filter(l => l.name.toLowerCase().includes(val));
+  if (!matches.length) { list.classList.remove('show'); return; }
+  list.innerHTML = matches.map(l =>
+    `<div class="autocomplete-item" onclick="selectLedger('${l.name.replace(/'/g,"\\'")}','${input.id}','${listId}')">${l.name}</div>`
+  ).join('');
+  list.classList.add('show');
+}
+function selectLedger(name, inputId, listId) {
+  document.getElementById(inputId).value = name;
+  document.getElementById(listId).classList.remove('show');
+}
+
+// ===== JOURNAL ENTRY =====
+function saveJournal() {
+  const l1 = document.getElementById('ledger1').value.trim();
+  const l2 = document.getElementById('ledger2').value.trim();
+  const cr1 = parseFloat(document.getElementById('cr1').value) || 0;
+  const dr1 = parseFloat(document.getElementById('dr1').value) || 0;
+  const cr2 = parseFloat(document.getElementById('cr2').value) || 0;
+  const dr2 = parseFloat(document.getElementById('dr2').value) || 0;
+  const date = document.getElementById('entry-date').value;
+  const remarks = document.getElementById('remarks').value.trim();
+
+  if (!l1 && !l2) { showToast('Enter at least one ledger', '⚠️'); return; }
+  const amount = cr1 || dr1 || cr2 || dr2;
+  if (!amount) { showToast('Enter an amount', '⚠️'); return; }
+
+  const crLedger = cr1 ? l1 : (cr2 ? l2 : l1 || l2);
+  const drLedger = dr1 ? l1 : (dr2 ? l2 : l2 || l1);
+  journals.unshift({ date, cr: crLedger, dr: drLedger, amount, remarks });
+
+  ['ledger1','ledger2','cr1','dr1','cr2','dr2','remarks'].forEach(id => { document.getElementById(id).value = ''; });
+  saveCompanyData();
+  refreshEntries();
+  showToast('Journal entry saved!', '✅');
+}
+
+function refreshEntries() {
+  const list = document.getElementById('entries-list');
+  document.getElementById('entries-count').textContent = journals.length + ' entries';
+  if (!journals.length) {
+    list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-light);font-size:13px;">
+      <div style="font-size:40px;margin-bottom:10px;">📄</div>No entries yet.</div>`;
+    return;
+  }
+  list.innerHTML = journals.slice(0,20).map(j => `
+    <div class="entry-row">
+      <div class="entry-row-left">
+        <div class="particulars">${j.cr} → ${j.dr}</div>
+        <div class="date">${fmtDate(j.date)}${j.remarks ? ' · '+j.remarks : ''}</div>
+      </div>
+      <div class="entry-row-right">
+        <div class="amount">₹${j.amount.toLocaleString('en-IN')}</div>
+        <span class="cr-badge">Cr</span><span class="dr-badge">Dr</span>
+      </div>
+    </div>`).join('');
+}
+
+// ===== REPORTS =====
+function showReport(type) {
+  document.getElementById('report-list-view').style.display = 'none';
+  const detail = document.getElementById('report-detail-view');
+  detail.style.display = '';
+  detail.innerHTML = buildReport(type);
+}
+function backToReports() {
+  document.getElementById('report-list-view').style.display = '';
+  document.getElementById('report-detail-view').style.display = 'none';
+}
+function fmt(n) { return '₹' + n.toLocaleString('en-IN'); }
+
+function buildReport(type) {
+  const today = fmtDate(new Date().toISOString().split('T')[0]);
+  const titles = { ledger:'📖 Ledger', daybook:'📅 Day Book', trial:'⚖️ Trial Balance', grouptrial:'📚 Group Trial Balance', pl:'📈 Profit & Loss', bs:'📋 Balance Sheet' };
+  let html = `<div class="report-header"><h3>${titles[type]||type}</h3>
+    <button class="back-btn" onclick="backToReports()">← Back</button></div>
+    <div class="report-date-bar"><span style="font-size:13px;color:var(--text-light);font-weight:600;">As on:</span>
+    <div class="date-badge" style="background:linear-gradient(90deg,var(--c2),var(--c3));color:white;border:none;padding:8px 14px;border-radius:8px;">${today}</div></div>`;
+
+  const lMap = {};
+  journals.forEach(j => {
+    if(!lMap[j.cr]) lMap[j.cr]={cr:0,dr:0};
+    if(!lMap[j.dr]) lMap[j.dr]={cr:0,dr:0};
+    lMap[j.cr].cr += j.amount;
+    lMap[j.dr].dr += j.amount;
+  });
+
+  const totalCr = journals.reduce((s,j)=>s+j.amount,0);
+
+  if (type === 'daybook') {
+    html += `<div class="summary-cards">
+      <div class="summary-card"><div class="s-label">Total Credit</div><div class="s-val credit">${fmt(totalCr)}</div></div>
+      <div class="summary-card"><div class="s-label">Total Debit</div><div class="s-val debit">${fmt(totalCr)}</div></div>
+      <div class="summary-card"><div class="s-label">Entries</div><div class="s-val total">${journals.length}</div></div>
+    </div>`;
+    if (!journals.length) { html += emptyState('No transactions recorded yet.'); return html; }
+    html += `<div class="report-table-wrap"><table class="report-table">
+      <thead><tr><th>Particulars (Cr)</th><th class="right">Credit</th><th>Particulars (Dr)</th><th class="right">Debit</th></tr></thead><tbody>`;
+    journals.forEach(j => { html += `<tr><td>${j.cr}</td><td class="credit">${fmt(j.amount)}</td><td>${j.dr}</td><td class="debit">${fmt(j.amount)}</td></tr>`; });
+    html += `</tbody><tfoot><tr class="report-total-row"><td><strong>Total</strong></td><td class="credit"><strong>${fmt(totalCr)}</strong></td><td><strong>Total</strong></td><td class="debit"><strong>${fmt(totalCr)}</strong></td></tr></tfoot></table></div>`;
+
+  } else if (type === 'ledger') {
+    if (!ledgers.length) { html += emptyState('No ledgers created yet.'); return html; }
+    html += `<div class="report-table-wrap"><table class="report-table">
+      <thead><tr><th>Ledger Name</th><th>Group</th><th class="right">Credit</th><th class="right">Debit</th><th class="right">Balance</th></tr></thead><tbody>`;
+    ledgers.forEach(l => {
+      const d = lMap[l.name]||{cr:0,dr:0};
+      const bal = Math.abs(d.cr-d.dr);
+      const bType = d.cr>=d.dr?'Cr':'Dr';
+      html += `<tr><td style="font-weight:600;">${l.name}</td><td style="font-size:11px;color:var(--text-light);">${l.group}</td>
+        <td class="credit">${d.cr?fmt(d.cr):'—'}</td><td class="debit">${d.dr?fmt(d.dr):'—'}</td>
+        <td style="text-align:right;font-weight:600;">${bal?fmt(bal)+' '+bType:'—'}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+
+  } else if (type === 'trial' || type === 'grouptrial') {
+    const crE = Object.entries(lMap).filter(([,v])=>v.cr>v.dr);
+    const drE = Object.entries(lMap).filter(([,v])=>v.dr>=v.cr&&(v.cr||v.dr));
+    if (!crE.length && !drE.length) { html += emptyState('No transactions to display.'); return html; }
+    const maxLen = Math.max(crE.length,drE.length);
+    let totCr=0,totDr=0;
+    html += `<div class="report-table-wrap"><table class="report-table">
+      <thead><tr><th>Particulars</th><th class="right">Credit</th><th>Particulars</th><th class="right">Debit</th></tr></thead><tbody>`;
+    for (let i=0;i<maxLen;i++) {
+      const c=crE[i]||null, d=drE[i]||null;
+      if(c) totCr+=c[1].cr-c[1].dr;
+      if(d) totDr+=d[1].dr-d[1].cr;
+      html+=`<tr><td>${c?c[0]:''}</td><td class="credit">${c?fmt(c[1].cr-c[1].dr):''}</td>
+        <td>${d?d[0]:''}</td><td class="debit">${d?fmt(d[1].dr-d[1].cr):''}</td></tr>`;
+    }
+    html+=`</tbody><tfoot><tr class="report-total-row"><td><strong>Total</strong></td><td class="credit"><strong>${fmt(totCr)}</strong></td>
+      <td><strong>Total</strong></td><td class="debit"><strong>${fmt(totDr)}</strong></td></tr></tfoot></table></div>`;
+
+  } else if (type === 'pl') {
+    html += `<div class="report-table-wrap" style="padding:40px;text-align:center;color:var(--text-light);">
+      <div style="font-size:48px;margin-bottom:12px;">📈</div>
+      <p style="font-size:15px;font-weight:600;color:var(--c1);">Profit &amp; Loss Account</p>
+      <p style="font-size:13px;margin-top:6px;">as on ${today}</p>
+      <div style="display:flex;justify-content:center;gap:40px;margin-top:20px;">
+        <div><p style="font-size:12px;color:var(--text-light);">Total Income</p><p style="font-size:22px;font-weight:700;color:var(--success);">₹0</p></div>
+        <div><p style="font-size:12px;color:var(--text-light);">Total Expenses</p><p style="font-size:22px;font-weight:700;color:var(--danger);">₹0</p></div>
+      </div>
+      <p style="margin-top:16px;font-size:13px;">Add income/expense ledgers to see P&amp;L.</p></div>`;
+
+  } else if (type === 'bs') {
+    const totalDebitors = journals.reduce((s,j)=>{
+      if(ledgers.find(l=>l.name===j.dr&&l.group==='CREDITORS / DEBTORS')) return s+j.amount; return s;
+    },0);
+    html += `<p style="font-size:13px;font-weight:700;text-align:center;color:var(--c1);margin-bottom:12px;">Balance Sheet as on ${today}</p>
+    <div class="bs-grid">
+      <div class="bs-side">
+        <div class="bs-side-header liab">Liabilities</div>
+        <div class="bs-item"><div class="bs-item-name">Capital</div><div class="bs-item-amount liab">₹0</div></div>
+        <div class="bs-item"><div class="bs-item-name">Creditors</div><div class="bs-item-amount liab">${fmt(totalDebitors)}</div></div>
+        <div class="bs-total"><span>Total</span><strong>${fmt(totalDebitors)}</strong></div>
+      </div>
+      <div class="bs-side">
+        <div class="bs-side-header assets">Assets</div>
+        <div class="bs-item"><div class="bs-item-name">Debtors</div><div class="bs-item-amount asset">${fmt(totalDebitors)}</div></div>
+        <div class="bs-item"><div class="bs-item-name">Cash &amp; Bank</div><div class="bs-item-amount asset">₹0</div></div>
+        <div class="bs-total"><span>Total</span><strong>${fmt(totalDebitors)}</strong></div>
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function emptyState(msg) {
+  return `<div class="report-table-wrap" style="padding:40px;text-align:center;color:var(--text-light);">
+    <div style="font-size:40px;margin-bottom:10px;">📂</div><p>${msg}</p></div>`;
+}
+
+// ===== LEDGER CRUD =====
+function selectGroup(el, mode) {
+  const grid = document.getElementById('group-grid-' + (mode==='create'?'create':'modify'));
+  grid.querySelectorAll('.group-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGroup = el.textContent.trim();
+}
+
+function saveLedger() {
+  const name = document.getElementById('new-ledger-name').value.trim();
+  if (!name) { showToast('Enter a ledger name', '⚠️'); return; }
+  if (ledgers.find(l=>l.name.toLowerCase()===name.toLowerCase())) { showToast('Ledger already exists!', '⚠️'); return; }
+  ledgers.push({
+    name,
+    balance: parseFloat(document.getElementById('new-ledger-balance').value)||0,
+    type:    document.getElementById('new-ledger-type').value,
+    address: document.getElementById('new-ledger-address').value,
+    contact: document.getElementById('new-ledger-contact').value,
+    group:   selectedGroup
+  });
+  ['new-ledger-name','new-ledger-balance','new-ledger-address','new-ledger-contact'].forEach(id=>document.getElementById(id).value='');
+  saveCompanyData();
+  closeModal('create-ledger-modal');
+  refreshLedgerList();
+  showToast('Ledger created: ' + name, '✅');
+}
+
+function refreshLedgerList() {
+  const el = document.getElementById('ledger-list-display');
+  if (!ledgers.length) {
+    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-light);">
+      <div style="font-size:32px;margin-bottom:6px;">📂</div>No ledgers yet.</div>`;
+  } else {
+    el.innerHTML = ledgers.map(l=>`
+      <div style="background:white;border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(3,4,94,0.07);border-left:3px solid var(--c3);">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--c1);">${l.name}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:2px;">${l.group}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:13px;font-weight:700;color:var(--c2);">₹${l.balance.toLocaleString('en-IN')}</div>
+          <div style="font-size:11px;color:var(--text-light);">${l.type}</div>
+        </div>
+      </div>`).join('');
+  }
+  const sel = document.getElementById('modify-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Select a ledger --</option>' +
+    ledgers.map(l=>`<option value="${l.name}">${l.name}</option>`).join('');
+  if (cur) sel.value = cur;
+}
+
+function loadLedgerToModify(name) {
+  if (!name) return;
+  const l = ledgers.find(x=>x.name===name);
+  if (!l) return;
+  document.getElementById('mod-name').value = l.name;
+  document.getElementById('mod-balance').value = l.balance;
+  document.getElementById('mod-type').value = l.type;
+  const grid = document.getElementById('group-grid-modify');
+  grid.querySelectorAll('.group-chip').forEach(c => {
+    c.classList.remove('selected');
+    if (c.textContent.trim()===l.group) { c.classList.add('selected'); selectedGroup=l.group; }
+  });
+}
+
+function updateLedger() {
+  const oldName = document.getElementById('modify-select').value;
+  const newName = document.getElementById('mod-name').value.trim();
+  if (!oldName||!newName) { showToast('Select and fill ledger details', '⚠️'); return; }
+  const idx = ledgers.findIndex(l=>l.name===oldName);
+  if (idx<0) return;
+  ledgers[idx] = {...ledgers[idx], name:newName, balance:parseFloat(document.getElementById('mod-balance').value)||0,
+    type:document.getElementById('mod-type').value, group:selectedGroup};
+  saveCompanyData();
+  closeModal('modify-ledger-modal');
+  refreshLedgerList();
+  showToast('Ledger updated!', '✅');
+}
+
+function deleteLedger() {
+  const name = document.getElementById('modify-select').value;
+  if (!name) return;
+  if (!confirm('Delete ledger "'+name+'"? This cannot be undone.')) return;
+  ledgers = ledgers.filter(l=>l.name!==name);
+  saveCompanyData();
+  closeModal('modify-ledger-modal');
+  refreshLedgerList();
+  showToast('Ledger deleted', '🗑️');
+}
+
+// ===== CHANGE FY =====
+function changeFY() {
+  const s = document.getElementById('new-fy-start').value;
+  const e = document.getElementById('new-fy-end').value;
+  currentFyStart = s; currentFyEnd = e;
+  const label = fyToLabel(s, e);
+  document.getElementById('fy-display').textContent = 'Financial Year ' + label;
+  saveCompanyData();
+  closeModal('change-fy-modal');
+  showToast('Financial year changed to ' + label, '📅');
+}
+
+// ===== EDIT COMPANY =====
+function saveCompanyEdit() {
+  const newName   = document.getElementById('edit-company-name').value.trim();
+  const curPass   = document.getElementById('edit-cur-pass').value;
+  const newPass   = document.getElementById('edit-new-pass').value;
+  const confPass  = document.getElementById('edit-conf-pass').value;
+  const address   = document.getElementById('edit-address').value;
+  const contact   = document.getElementById('edit-contact').value;
+
+  const companies = getCompanies();
+
+  // Verify current password
+  if (curPass !== companies[currentCompany].password) {
+    showToast('Current password is incorrect', '⚠️'); return;
+  }
+  if (newPass && newPass !== confPass) {
+    showToast('New passwords do not match', '⚠️'); return;
+  }
+
+  const updatedPass = newPass || companies[currentCompany].password;
+
+  // Handle company rename
+  if (newName && newName !== currentCompany) {
+    if (companies[newName]) { showToast('A company with that name already exists', '⚠️'); return; }
+    companies[newName] = { ...companies[currentCompany], password: updatedPass };
+    delete companies[currentCompany];
+    // Move data
+    const oldKey = getCompanyDataKey(currentCompany);
+    const oldData = localStorage.getItem(oldKey);
+    if (oldData) {
+      localStorage.setItem(getCompanyDataKey(newName), oldData);
+      localStorage.removeItem(oldKey);
+    }
+    currentCompany = newName;
+    document.getElementById('company-display').textContent = newName;
+  } else {
+    companies[currentCompany].password = updatedPass;
+  }
+
+  currentAddress = address;
+  currentContact = contact;
+  saveCompanies(companies);
+  saveCompanyData();
+  closeModal('edit-company-modal');
+  showToast('Company details updated!', '✅');
+}
+
+// ===== MODAL =====
+function openModal(id) {
+  if (id==='modify-ledger-modal') refreshLedgerList();
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function closeOnBackdrop(e, id) { if (e.target.id===id) closeModal(id); }
+
+// ===== CALCULATOR =====
+function calcBtn(v) {
+  const disp = document.getElementById('calc-display');
+  const hist = document.getElementById('calc-history');
+  if (v==='C') { calcStr=''; disp.textContent='0'; hist.textContent=''; return; }
+  if (v==='=') {
+    try {
+      hist.textContent = calcStr.replace(/\*/g,'×').replace(/\//g,'÷') + ' =';
+      const r = Math.round(Function('"use strict";return ('+calcStr+')')()*100)/100;
+      disp.textContent = r.toLocaleString('en-IN');
+      calcStr = String(r);
+    } catch(e) { disp.textContent='Error'; calcStr=''; }
+    return;
+  }
+  if (v==='%') { calcStr=String(parseFloat(calcStr||'0')/100); disp.textContent=calcStr; return; }
+  calcStr += v;
+  disp.textContent = calcStr.replace(/\*/g,'×').replace(/\//g,'÷');
+}
+
+// ===== TOAST =====
+function showToast(msg, icon) {
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = (icon||'ℹ️') + ' ';
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+// ===== PWA SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
