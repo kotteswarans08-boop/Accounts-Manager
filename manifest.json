@@ -1,0 +1,35 @@
+{
+  "name": "Chit Accounts Manager",
+  "short_name": "ChitAccounts",
+  "description": "Smart accounting app for chit fund businesses",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#03045E",
+  "theme_color": "#03045E",
+  "lang": "en",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "app-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "app-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "app-logo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
