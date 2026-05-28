@@ -9,6 +9,7 @@
   "theme_color": "#03045E",
   "lang": "en",
   "scope": "./",
+  "id": "./index.html",
   "icons": [
     {
       "src": "app-logo.png",
@@ -31,5 +32,11 @@
   ],
   "categories": ["finance", "business", "productivity"],
   "screenshots": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "dir": "ltr",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "auto"
+  }
 }
