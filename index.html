@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <title>Chit Accounts Manager</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#03045E">
@@ -1178,13 +1178,19 @@ window.addEventListener('load', function() {
 // AUTO-FILL REMEMBERED COMPANY + PASSWORD
 // ========================================================
 function autoFillRemembered() {
-  const companies = getCompanies();
-  // Find any company with remember=true
-  const found = Object.entries(companies).find(([, v]) => v.remember);
-  if (found) {
-    document.getElementById('company-name').value    = found[0];
-    document.getElementById('login-password').value  = found[1].password;
-    document.getElementById('remember-me').checked   = true;
+  const companies  = getCompanies();
+  const lastUsed   = localStorage.getItem('cam_last_used') || '';
+  // Use last-used company if it has remember=true, else fall back to any remembered company
+  let target = null;
+  if (lastUsed && companies[lastUsed] && companies[lastUsed].remember) {
+    target = [lastUsed, companies[lastUsed]];
+  } else {
+    target = Object.entries(companies).find(([, v]) => v.remember) || null;
+  }
+  if (target) {
+    document.getElementById('company-name').value   = target[0];
+    document.getElementById('login-password').value = target[1].password;
+    document.getElementById('remember-me').checked  = true;
   }
 }
 
@@ -1302,6 +1308,8 @@ function enterApp(name, fyStart, fyEnd) {
   localStorage.setItem(SESSION_KEY, JSON.stringify({
     company: name, fyStart: currentFyStart, fyEnd: currentFyEnd
   }));
+  // Track last-used company for auto-fill on next open
+  localStorage.setItem('cam_last_used', name);
 
   const fyLabel = fyToLabel(currentFyStart, currentFyEnd);
   document.getElementById('company-display').textContent = name;
