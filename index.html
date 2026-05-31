@@ -230,13 +230,16 @@
   .ledger-input::placeholder { color: #aab8c2; }
 
   .amount-input {
-    width: 80px; border: none; text-align: right;
+    width: 100%; border: none; text-align: right;
     font-size: 14px; color: var(--text-dark);
     background: transparent; outline: none;
-    padding: 4px 0; border-bottom: 1.5px solid var(--gray-mid);
+    padding: 4px 2px; border-bottom: 1.5px solid var(--gray-mid);
     transition: border-color 0.2s;
     white-space: nowrap; overflow: hidden;
+    -moz-appearance: textfield;
   }
+  .amount-input::-webkit-outer-spin-button,
+  .amount-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .amount-input:focus { border-bottom-color: var(--c3); }
 
   .remarks-input {
@@ -276,11 +279,13 @@
     background: var(--white); border-radius: var(--radius-sm);
     padding: 12px 16px; margin-bottom: 8px;
     display: flex; justify-content: space-between; align-items: center;
+    gap: 8px;
     box-shadow: var(--shadow-sm); border-left: 4px solid var(--c3);
   }
-  .entry-row-left .particulars { font-size: 13px; font-weight: 600; color: var(--c1); }
+  .entry-row-left { flex: 1; min-width: 0; }
+  .entry-row-left .particulars { font-size: 13px; font-weight: 600; color: var(--c1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .entry-row-left .date { font-size: 11px; color: var(--text-light); margin-top: 2px; }
-  .entry-row-right { text-align: right; }
+  .entry-row-right { text-align: right; flex-shrink: 0; }
   .entry-row-right .amount {
     font-size: 15px; font-weight: 700; color: var(--c2);
     white-space: nowrap;
@@ -337,8 +342,8 @@
     padding: 11px 10px; border-bottom: 1px solid var(--gray-mid);
     font-size: 13px; color: var(--text-dark); word-break: break-word;
   }
-  .report-table td.credit { color: var(--success); font-weight: 600; text-align: right; }
-  .report-table td.debit { color: #1565c0; font-weight: 600; text-align: right; }
+  .report-table td.credit { color: var(--success); font-weight: 600; text-align: right; white-space: nowrap; }
+  .report-table td.debit { color: #1565c0; font-weight: 600; text-align: right; white-space: nowrap; }
   .report-table tr:last-child td { border-bottom: none; }
   .report-table tr:hover td { background: #f8fcff; }
   .report-total-row td { background: var(--c5); font-weight: 700; color: var(--c1); border-bottom: none; border-top: 1.5px solid var(--c4); }
@@ -551,8 +556,8 @@
           <thead>
             <tr>
               <th>Particulars</th>
-              <th class="right" style="width:85px;">Credit</th>
-              <th class="right" style="width:85px;">Debit</th>
+              <th class="right" style="width:95px;">Credit</th>
+              <th class="right" style="width:95px;">Debit</th>
             </tr>
           </thead>
           <tbody>
@@ -1026,8 +1031,8 @@
       <thead>
         <tr>
           <th>Particulars</th>
-          <th class="right" style="width:120px;">Amount</th>
-          <th class="right" style="width:60px;">Type</th>
+          <th class="right" style="width:110px;">Amount</th>
+          <th class="right" style="width:50px;">Type</th>
         </tr>
       </thead>
       <tbody>
@@ -1040,7 +1045,8 @@
             </div>
           </td>
           <td>
-            <input class="amount-input" id="mod-entry-amount" type="number" placeholder="0.00" step="0.01" min="0">
+            <input class="amount-input" id="mod-entry-amount" type="number" placeholder="0.00" step="0.01" min="0"
+                   oninput="document.getElementById('mod-entry-amount-dr').value=this.value;">
           </td>
           <td style="text-align:right;padding:10px 6px;">
             <span style="background:#e8f5e9;color:var(--success);font-size:11px;font-weight:700;padding:3px 7px;border-radius:4px;">Cr</span>
@@ -1054,7 +1060,10 @@
               <input class="ledger-input" id="mod-entry-dr" placeholder="Debit ledger name..." autocomplete="off">
             </div>
           </td>
-          <td></td>
+          <td>
+            <input class="amount-input" id="mod-entry-amount-dr" type="number" placeholder="0.00" step="0.01" min="0" readonly
+                   style="color:var(--text-light);cursor:default;">
+          </td>
           <td style="text-align:right;padding:10px 6px;">
             <span style="background:#fdecea;color:var(--danger);font-size:11px;font-weight:700;padding:3px 7px;border-radius:4px;">Dr</span>
           </td>
@@ -1615,9 +1624,10 @@ function buildPersonLedger(name) {
 function fmt(n) { return '₹' + n.toLocaleString('en-IN'); }
 
 function buildReport(type) {
+  const latestEntryDate = journals.length ? [...journals].sort((a,b) => b.date.localeCompare(a.date))[0].date : new Date().toISOString().split('T')[0];
   const today = reportFilter
     ? fmtDate(reportFilter)
-    : fmtDate(new Date().toISOString().split('T')[0]);
+    : (type === 'daybook' ? fmtDate(latestEntryDate) : fmtDate(new Date().toISOString().split('T')[0]));
   const titles = {
     ledger:'📖 Ledger', daybook:'📅 Day Book', trial:'⚖️ Trial Balance',
     grouptrial:'📚 Group Trial Balance', pl:'📈 Profit & Loss', bs:'📋 Balance Sheet'
@@ -1639,7 +1649,9 @@ function buildReport(type) {
   });
 
   if (type === 'daybook') {
-    const raw            = reportFilter ? journals.filter(j => j.date === reportFilter) : journals;
+    // Default to latest date that has entries when no filter selected
+    const latestDate = reportFilter || (journals.length ? [...journals].sort((a,b) => b.date.localeCompare(a.date))[0].date : null);
+    const raw            = latestDate ? journals.filter(j => j.date === latestDate) : journals;
     const daybookEntries = raw.slice().reverse();
     const daybookTotal   = daybookEntries.reduce((s,j) => s + j.amount, 0);
     html += `<div class="summary-cards">
@@ -1658,7 +1670,7 @@ function buildReport(type) {
       byDate[date].forEach((j, i) => {
         const jIdx = journals.indexOf(j);
         html += `<tr style="cursor:pointer;" onclick="openModifyByIdx(${jIdx})">
-          <td style="font-size:11px;color:var(--text-light);">${i===0 ? fmtDate(date) : ''}</td>
+          <td style="font-size:11px;color:var(--text-light);">${fmtDate(date)}</td>
           <td style="font-weight:600;">${j.cr}</td>
           <td class="credit">${fmt(j.amount)}</td>
           <td style="font-weight:600;">${j.dr}</td>
@@ -2082,6 +2094,7 @@ function openModifyByIdx(idx) {
   document.getElementById('mod-entry-cr').value              = j.cr;
   document.getElementById('mod-entry-dr').value              = j.dr;
   document.getElementById('mod-entry-amount').value          = j.amount;
+  document.getElementById('mod-entry-amount-dr').value       = j.amount; // mirror debit amount
   document.getElementById('mod-entry-remarks').value         = j.remarks || '';
   openModal('modify-entry-modal');
 }
